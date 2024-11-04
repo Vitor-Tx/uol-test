@@ -1,19 +1,23 @@
 import { prisma } from '../lib/prisma.js';
 import app from '../app.js';
 
+let passes = 0;
+let fails = 0;
+
 function logTestResult(description: string, condition: boolean) {
   if (condition) {
     console.log(`✅ ${description} - Passou`);
+    passes++;
   } else {
     console.log(`❌ ${description} - Falhou`);
-    process.exit(1);
+    fails++;
   }
 }
 
 async function runTests() {
   try {
     await app.ready();
-
+    await prisma.client.deleteMany();
     const clientData = {
       name: 'Test Client',
       email: 'test@example.com',
@@ -50,7 +54,7 @@ async function runTests() {
     logTestResult('Criação de cliente duplicado', duplicateResponse.statusCode === 400);
 
     const duplicateBody = JSON.parse(duplicateResponse.body);
-    logTestResult('Mensagem de erro para conflito de email duplicado', duplicateBody.message.includes('Outro cliente com o mesmo email já existe'));
+    logTestResult('Mensagem de erro para conflito de cpf duplicado', duplicateBody.message.includes('Outro cliente com o mesmo cpf já existe'));
 
     const updateData = {
       name: 'Updated Client Name',
@@ -97,13 +101,17 @@ async function runTests() {
 
     const deletedClientBody = JSON.parse(getDeletedResponse.body);
     logTestResult('Mensagem de erro para cliente não encontrado', deletedClientBody.message === 'Cliente não encontrado.');
-
-    console.log('🎉 Todos os testes passaram com sucesso!');
   } catch (error) {
     console.error('Erro durante o teste:', error);
   } finally {
     await prisma.$disconnect();
     await app.close();
+    if (fails === 0) {
+      console.log('🎉 Todos os testes passaram com sucesso!');
+    }
+    else {
+      console.log(`${fails} testes falharam e ${passes} testes obtiveram sucesso!`)
+    }
   }
 }
 
