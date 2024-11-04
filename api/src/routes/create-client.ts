@@ -54,7 +54,7 @@ export async function createClient(app: FastifyInstance) {
       })
 
       if (clientWithSameCpf !== null) {
-        throw new BadRequest('Outro cliente com o mesmo email já existe.')
+        throw new BadRequest('Outro cliente com o mesmo cpf já existe.')
       }
 
       if (clientWithSameEmail !== null) {
