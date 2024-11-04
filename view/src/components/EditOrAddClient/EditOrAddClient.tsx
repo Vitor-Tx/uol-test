@@ -119,12 +119,15 @@ function EditOrAddClient(props: EditOrAddClientProps) {
       newErrors.email = "Email inválido.";
     }
 
-    if (!validateCPF(cpf)) {
-      newErrors.cpf = "CPF inválido.";
+    const cleanedCpf = cpf.replace(/\D/g, '');
+    if (cleanedCpf.length !== 11 || !validateCPF(cleanedCpf)) {
+      newErrors.cpf = "CPF deve ter exatamente 11 dígitos e ser válido.";
     }
 
-    if (!validatePhone(phone)) {
-      newErrors.phone = "Número de telefone inválido.";
+
+    const cleanedPhone = phone.replace(/\D/g, '');
+    if (cleanedPhone.length < 10 || cleanedPhone.length > 11 || !validatePhone(cleanedPhone)) {
+      newErrors.phone = "Número de telefone deve ter entre 10 e 11 dígitos e ser válido.";
     }
 
     setErrors(newErrors);
@@ -241,7 +244,7 @@ function EditOrAddClient(props: EditOrAddClientProps) {
           type="text"
           placeholder="CPF"
           value={cpf}
-          onChange={(e) => setCpf(maskCPF(e.target.value))}
+          onChange={(e) => setCpf(maskCPF(e.target.value.replace(/\D/g, '').slice(0, 11)))}
         />
         {errors.cpf && <Error>{errors.cpf}</Error>}
 
@@ -249,7 +252,7 @@ function EditOrAddClient(props: EditOrAddClientProps) {
           type="text"
           placeholder="Phone"
           value={phone}
-          onChange={(e) => setPhone(maskPhone(e.target.value))}
+          onChange={(e) => setPhone(maskPhone(e.target.value.replace(/\D/g, '').slice(0, 11)))}
         />
         <Error>{errors.phone && <p>{errors.phone}</p>}</Error>
         <Select value={status} onChange={(e) => setStatus(e.target.value as Client['status'])}>
