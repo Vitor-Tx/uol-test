@@ -28,7 +28,6 @@ export async function getClient(app: FastifyInstance) {
       },
     }, async (request, reply) => {
       const { id } = request.params;
-      console.log(request.params)
 
       const client = await prisma.client.findUnique({
         select: {
@@ -42,10 +41,6 @@ export async function getClient(app: FastifyInstance) {
         },
         where: { id },
       });
-
-
-      console.log(client)
-
 
       if (client === null) {
         throw new BadRequest('Cliente não encontrado.')
