@@ -27,7 +27,7 @@ Este projeto foi desenvolvido para criar um CRUD de clientes para a UOL, incluin
 
 O front end foi desenvolvido usando **React**, **Vite** para otimização, **TypeScript** para tipagem, **React Bootstrap** para estilização, **styled-components** para customização visual, e **Context API** para gerenciamento de estado.
 
-O back end foi desenvolvido com **Node.js** usando **Fastify** como framework, **Prisma** para ORM, **Zod** para validação de dados, **SQLite** para banco de dados local, e **Swagger** para documentação da API. **Faker.js** foi utilizado para gerar dados fictícios.
+O back end foi desenvolvido com **Node.js** usando **Fastify** como framework, **Prisma** para ORM, **Zod** para validação de dados, **SQLite** para banco de dados local, e **Swagger** para documentação da API. **Faker.js** foi utilizado para gerar dados fictícios. Os testes para o backend foram implementados utilizando o [`fastify.inject()`](https://fastify.dev/docs/latest/Guides/Testing/#benefits-of-using-fastifyinject).
 
 ---
 
@@ -56,6 +56,7 @@ No diretório `/src` do back end, temos:
 - `/interfaces`: Define a mesma interface `Client` usada no front end.
 - `/lib`: Configurações para Prisma, incluindo logging.
 - `/routes`: Contém as rotas de API para a aplicação.
+- `/tests`: Contém os testes unitários do backend.
 - `errorHandler.ts`: Manipula erros na API.
 - `server.ts`: Configura o servidor, definindo as rotas e integrando Fastify e outros módulos.
 
@@ -74,6 +75,7 @@ No diretório `/src` do back end, temos:
 - **Validação de Formulário**: O formulário de criação e edição valida o nome, CPF, telefone e e-mail do cliente. Mensagens de erro são exibidas caso os dados estejam incorretos.
 - **Responsividade**: A aplicação se ajusta para diferentes tamanhos de tela, com cada cartão de cliente sendo exibido em layout responsivo.
 - **Documentação da API com Swagger**: A API possui documentação acessível via Swagger UI, incluindo exemplos de uso para cada rota.
+- **Testes unitários - Back End**: Diversos testes foram implementados para as rotas da api.
 
 ---
 
@@ -143,6 +145,13 @@ Para rodar o projeto localmente, você precisará do **Node.js** e **npm** insta
 
 8. A documentação da API pode ser acessada em `http://localhost:3333/docs`.
 
+9. Para rodar os testes do back end:
+
+```bash
+  # na pasta raíz do back end rode:
+  $ npm run test
+```
+<img src="./assets/images/capa4.png" style="max-width: 100%">
 ---
 
 ## Tecnologias Utilizadas
