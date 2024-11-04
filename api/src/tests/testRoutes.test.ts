@@ -1,6 +1,15 @@
 import { prisma } from '../lib/prisma.js';
 import app from '../app.js';
 
+function logTestResult(description: string, condition: boolean) {
+  if (condition) {
+    console.log(`✅ ${description} - Passou`);
+  } else {
+    console.log(`❌ ${description} - Falhou`);
+    process.exit(1);
+  }
+}
+
 async function runTests() {
   try {
     await app.ready();
@@ -18,30 +27,30 @@ async function runTests() {
       url: '/clients',
       payload: clientData,
     });
+    logTestResult('Criação de cliente', createResponse.statusCode === 201);
 
-    console.assert(createResponse.statusCode === 201, 'Expected status code 201 for client creation');
     const createdClient = JSON.parse(createResponse.body);
     const clientId = createdClient.clientId;
-    console.assert(clientId !== undefined, 'Expected created client to have an ID');
+    logTestResult('Cliente criado com ID válido', clientId !== undefined);
 
     const getResponse = await app.inject({
       method: 'GET',
       url: `/clients/${clientId}`,
     });
+    logTestResult('Listagem de cliente pelo ID', getResponse.statusCode === 200);
 
-    console.assert(getResponse.statusCode === 200, 'Expected status code 200 when retrieving client by ID');
     const retrievedClient = JSON.parse(getResponse.body);
-    console.assert(retrievedClient.id === parseInt(clientId), 'Expected retrieved client ID to match created client ID');
+    logTestResult('ID do cliente listado corresponde ao criado', retrievedClient.id === parseInt(clientId));
 
     const duplicateResponse = await app.inject({
       method: 'POST',
       url: '/clients',
       payload: clientData,
     });
+    logTestResult('Criação de cliente duplicado', duplicateResponse.statusCode === 400);
 
-    console.assert(duplicateResponse.statusCode === 400, 'Expected status code 400 for duplicate client creation');
     const duplicateBody = JSON.parse(duplicateResponse.body);
-    console.assert(duplicateBody.message.includes('Outro cliente com o mesmo email já existe'), 'Expected duplicate email conflict error');
+    logTestResult('Mensagem de erro para conflito de email duplicado', duplicateBody.message.includes('Outro cliente com o mesmo email já existe'));
 
     const updateData = {
       name: 'Updated Client Name',
@@ -56,42 +65,42 @@ async function runTests() {
       url: `/clients/${clientId}`,
       payload: updateData,
     });
+    logTestResult('Atualização de cliente', updateResponse.statusCode === 200);
 
-    console.assert(updateResponse.statusCode === 200, 'Expected status code 200 for client update');
     const updatedClient = JSON.parse(updateResponse.body);
-    console.assert(updatedClient.clientId === clientId, 'Expected updated client ID to match original client ID');
+    logTestResult('ID do cliente atualizado corresponde ao original', updatedClient.clientId === clientId);
 
     const getAllResponse = await app.inject({
       method: 'GET',
       url: '/clients?pageIndex=0',
     });
+    logTestResult('Listagem de todos os clientes', getAllResponse.statusCode === 200);
 
-    console.assert(getAllResponse.statusCode === 200, 'Expected status code 200 when retrieving all clients');
     const allClients = JSON.parse(getAllResponse.body);
-    console.assert(Array.isArray(allClients.clients), 'Expected clients property to be an array');
-    console.assert(allClients.total >= 1, 'Expected at least one client in total count');
+    logTestResult('Lista de clientes retornada é uma array', Array.isArray(allClients.clients));
+    logTestResult('Contagem total de clientes é pelo menos 1', allClients.total >= 1);
 
     const deleteResponse = await app.inject({
       method: 'DELETE',
       url: `/clients/${clientId}`,
     });
+    logTestResult('Exclusão de cliente', deleteResponse.statusCode === 200);
 
-    console.assert(deleteResponse.statusCode === 200, 'Expected status code 200 for client deletion');
     const deleteBody = JSON.parse(deleteResponse.body);
-    console.assert(deleteBody.message === 'Cliente excluído com sucesso.', 'Expected success message for client deletion');
+    logTestResult('Mensagem de sucesso para exclusão de cliente', deleteBody.message === 'Cliente excluído com sucesso.');
 
     const getDeletedResponse = await app.inject({
       method: 'GET',
       url: `/clients/${clientId}`,
     });
+    logTestResult('Listagem de cliente excluído', getDeletedResponse.statusCode === 400);
 
-    console.assert(getDeletedResponse.statusCode === 400, 'Expected status code 400 when retrieving deleted client');
     const deletedClientBody = JSON.parse(getDeletedResponse.body);
-    console.assert(deletedClientBody.message === 'Cliente não encontrado.', 'Expected not found message for deleted client');
+    logTestResult('Mensagem de erro para cliente não encontrado', deletedClientBody.message === 'Cliente não encontrado.');
 
-    console.log('All tests passed successfully!');
+    console.log('🎉 Todos os testes passaram com sucesso!');
   } catch (error) {
-    console.error('Test failed:', error);
+    console.error('Erro durante o teste:', error);
   } finally {
     await prisma.$disconnect();
     await app.close();
