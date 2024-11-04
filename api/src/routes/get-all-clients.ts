@@ -47,7 +47,7 @@ export async function getAllClients(app: FastifyInstance) {
           take: 10,
           skip: pageIndex * 10,
           orderBy: {
-            createdAt: 'desc'
+            id: 'asc'
           }
         }),
         prisma.client.count()
