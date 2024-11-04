@@ -76,6 +76,7 @@ No diretório `/src` do back end, temos:
 - **Responsividade**: A aplicação se ajusta para diferentes tamanhos de tela, com cada cartão de cliente sendo exibido em layout responsivo.
 - **Documentação da API com Swagger**: A API possui documentação acessível via Swagger UI, incluindo exemplos de uso para cada rota.
 - **Testes unitários - Back End**: Diversos testes foram implementados para as rotas da api.
+- **Possíveis funcionalidades para o futuro**: Botão para deletar cliente, paginação para clientes(atualmente paginação é implementada apenas no backend), testes para o frontend, e mais!
 
 ---
 
